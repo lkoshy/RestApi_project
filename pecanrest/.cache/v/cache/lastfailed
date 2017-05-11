@@ -1,0 +1,5 @@
+{
+  "pecanrest/tests/test_functional.py::TestRootController::()::test_get": true,
+  "pecanrest/tests/test_functional.py::TestRootController::()::test_get_not_found": true,
+  "pecanrest/tests/test_functional.py::TestRootController::()::test_search": true
+}

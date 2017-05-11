@@ -1,0 +1,89 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a simple web crawler.",
+    "version": "0.0.1",
+    "title": "Web Crawler"
+  },
+  "basePath": "/demo",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/crawl": {
+      "get": {
+        "tags": [
+          "crawl"
+        ],
+        "summary": "Get the URL and determine the page title, meta data, and links on it",
+        "description": "",
+        "operationId": "crawl",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "description": "URL of the webpage",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "400": {
+            "description": "Invalid url entered / Missing parameter URL"
+          }
+        }
+      }
+    },
+    "/sytemtime": {
+      "get": {
+        "tags": [
+          "crawl"
+        ],
+        "summary": "Get the system time in RFC3339 format",
+        "description": "",
+        "operationId": "sytemtime",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/systemstatus": {
+      "get": {
+        "tags": [
+          "crawl"
+        ],
+        "summary": "Get the details of the API application.",
+        "description": "",
+        "operationId": "systemstatus",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

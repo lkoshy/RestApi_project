@@ -1,9 +1,11 @@
 import strict_rfc3339
 import requests
 import time
+import os, psutil
 from bs4 import BeautifulSoup
 from pecan import expose, abort
 from pecan.rest import RestController
+from requests.exceptions import ConnectionError
 
 
 _STATUS_MAP = {}
@@ -34,12 +36,7 @@ def get_response(url):
     Returns:
         a response object
     """
-    try:
-        response = requests.get(url, timeout=5)
-    except requests.Timeout as e:
-        raise Exception('HTTP Response Timeout: %s' % e.message)
-
-    return response
+    return requests.get(url, timeout=5)
 
 
 class CrawlController(RestController):
@@ -50,15 +47,19 @@ class CrawlController(RestController):
     def index(self, **kwargs):
 
         # Validate the URL key.
-        if len(kwargs) > 1 and 'url' not in kwargs:
-            abort(400, 'Either Invalid number of keys or Missing URL key')
+        if 'url' not in kwargs:
+            abort(400, 'Missing parameter URL')
+
+        url = kwargs['url']
 
         # Get the response
-        url = kwargs['url']
-        response = get_response(url)
+        try:
+            response = get_response(url)
+        except:
+            abort(400, 'Invalid URL')
 
         if not response or response.status_code != 200:
-            raise Exception('HTTP Response Not OK. Response code: %s' % response.status_code)
+            abort(400, 'Invalid URL')
 
         soup = BeautifulSoup(response.text, 'html.parser')
         page_links = [link.get('href') for link in soup.find_all('a')]
@@ -70,16 +71,18 @@ class CrawlController(RestController):
                 'Meta Data': [meta.get('name') for meta in soup.find_all('meta')]}
 
 
-class StatusController:
+class SystemStatusController:
     """
     Reports the current status of the API application.
     """
     @expose('json')
     def index(self):
-        return _STATUS_MAP if _STATUS_MAP else 'Nothing to display'
+        p = psutil.Process(os.getpid())
+        _STATUS_MAP['Server Uptime(sec):'] = time.time() - p.create_time()
+        return _STATUS_MAP
 
 
-class TimeController:
+class SystemTimeController:
     """
     Displays the current system time in RFC3339 format
     """
@@ -94,5 +97,5 @@ class DemoController(RestController):
     Router to crawl, time an status endpoints
     """
     crawl = CrawlController()
-    time = TimeController()
-    status = StatusController()
+    systemtime = SystemTimeController()
+    systemstatus = SystemStatusController()
